@@ -1,12 +1,15 @@
 import pandas as pd
 import numpy as np
+import math
 
-def compute_portfolio_historical_variance(assets_df : pd.DataFrame, weights):
+from pyeasyfi.constants.constants import PERIODIC_FACTORS
+
+
+def compute_portfolio_historical_volatility(assets_returns_df : pd.DataFrame, weights, generalization : str="annual"):
     weights = np.array(weights)
     weights_matrix = weights @ weights.T
-    cov_matrix = np.cov(assets_df, rowvar=False)
-    variance_matrix = np.diag([np.var(assets_df[x])  for x in assets_df.columns])
-    volatility_matrix = weights_matrix * (cov_matrix + variance_matrix - np.eye(len(weights)))
-    print(volatility_matrix)
+    cov_matrix = np.cov(assets_returns_df, rowvar=False)
+    volatility_matrix = weights_matrix * cov_matrix
     variance = np.sum(volatility_matrix)
-    return variance
+    volatility = math.sqrt(variance * PERIODIC_FACTORS[generalization])
+    return volatility
